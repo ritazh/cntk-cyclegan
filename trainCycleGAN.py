@@ -1,5 +1,7 @@
 import matplotlib as mpl
+mpl.use('Agg') # To fix issue with QXcbConnection: Could not connect to display and Aborted (core dumped)
 import matplotlib.pyplot as plt
+plt.ioff() # http://matplotlib.org/faq/usage_faq.html (interactive mode)
 import numpy as np
 import os
 import utils
@@ -20,7 +22,7 @@ from cntk.logging import ProgressPrinter, TensorBoardProgressWriter
 import cntk.io.transforms as xforms
 
 L1_lambda = 10
-
+isFast = True
 # training config
 MINIBATCH_SIZE = 128
 NUM_MINIBATCHES = 5000 if isFast else 10000
