@@ -20,8 +20,8 @@ spec:
             readOnly: false      
       containers:
       - name: cyclegan-trainer-cntk
-        command: ["/bin/sh", "-c"]
-        args: ["export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/lib:/usr/lib/x86_64-linux-gnu_custom:/usr/lib/x86_64-linux-gnu; echo $LD_LIBRARY_PATH; python trainDCGan.py;"]
+        command: ["/bin/bash", "-c"]
+        args: ["source '/cntk/activate-cntk'; export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/lib:/usr/lib/x86_64-linux-gnu_custom:/usr/lib/x86_64-linux-gnu; echo $LD_LIBRARY_PATH; python trainDCGan.py;"]
         image: ritazh/cyclegan-cntk
         resources:
           limits:
