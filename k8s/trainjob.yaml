@@ -21,7 +21,7 @@ spec:
       containers:
       - name: cyclegan-trainer-cntk
         command: ["/bin/sh", "-c"]
-        args: ["export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu_custom:$LD_LIBRARY_PATH;  python trainDCGan.py"]
+        args: ["export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/mpi/lib:/usr/lib/x86_64-linux-gnu_custom:/usr/lib/x86_64-linux-gnu; echo $LD_LIBRARY_PATH; python trainDCGan.py;"]
         image: ritazh/cyclegan-cntk
         resources:
           limits:
@@ -30,5 +30,11 @@ spec:
         - mountPath: /usr/lib/x86_64-linux-gnu_custom
           name: libraries
         - mountPath: "/data"
-          name: azurefile       
+          name: azurefile
+        imagePullPolicy: Always
+        env:
+        - name: MOVE_DATA_REMOTE
+          value: '1'
+        - name: MOVE_DATA_LOCALLY
+          value: '0'    
       restartPolicy: Never

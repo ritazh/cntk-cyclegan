@@ -28,4 +28,9 @@ spec:
     - mountPath: "/data"
       name: azurefile    
     imagePullPolicy: Always
+    env:
+    - name: MOVE_DATA_REMOTE
+      value: '1'
+    - name: MOVE_DATA_LOCALLY
+      value: '0'
   restartPolicy: Never
