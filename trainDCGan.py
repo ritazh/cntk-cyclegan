@@ -6,6 +6,9 @@ plt.ioff() # http://matplotlib.org/faq/usage_faq.html (interactive mode)
 import numpy as np
 import os
 import utils
+import datetime
+import distutils
+from distutils import dir_util
 
 import cntk as C
 from cntk import Trainer
@@ -22,8 +25,27 @@ from cntk.logging import ProgressPrinter, TensorBoardProgressWriter
 import cntk.io.transforms as xforms
 
 C.device.try_set_default_device(C.device.gpu(0))
+
+def move_data_locally(remote_path, local_path):
+    print('moving data from network share to local...')
+    t1 = datetime.datetime.now()
+    dir_util.copy_tree(remote_path, local_path)
+    t2 = datetime.datetime.now() 
+    print('move_data_locally took {}'.format(t2-t1))
+
+def move_data_remote(local_path, remote_path):
+    print('moving data from local to network share...')
+    t1 = datetime.datetime.now() 
+    dir_util.copy_tree(local_path, remote_path)
+    t2 = datetime.datetime.now() 
+    print('move_data_remote took {}'.format(t2-t1))
+
+if os.environ.get('MOVE_DATA_LOCALLY') and os.environ.get('MOVE_DATA_LOCALLY')=='1':
+    move_data_locally('/data', 'data')
+
 TB_LOGDIR_G = "tblogs_G"
 TB_LOGDIR_D = "tblogs_D"
+TEST_RESULT_DIR = "testResults"
 MAP_FILE = "data//trainingMNIST//map.txt"
 
 isFast = True
@@ -247,7 +269,7 @@ def train(reader_train, generator, discriminator):
         if np.mod(train_step, PROGRESS_SAVE_STEP) == 0:
             noise = noise_sample(36)
             images = X_fake.eval(noise)
-            utils.plot_images(images, subplot_shape=[6, 6],iteration=train_step)
+            utils.plot_images(images, subplot_shape=[6, 6],iteration=train_step, dirToSave=TEST_RESULT_DIR)
 
         D_trainer.summarize_training_progress()
         G_trainer.summarize_training_progress()
@@ -270,4 +292,9 @@ print("Training loss of the generator is: {0:.2f}".format(G_trainer_loss))
 
 noise = noise_sample(36)
 images = G_output.eval({G_input: noise})
-utils.plot_images(images, subplot_shape=[6, 6], iteration="test")
+utils.plot_images(images, subplot_shape=[6, 6], iteration="test", dirToSave=TEST_RESULT_DIR)
+
+if os.environ.get('MOVE_DATA_REMOTE') and os.environ.get('MOVE_DATA_REMOTE')=='1':
+    move_data_remote(TB_LOGDIR_G, '/data/' + TB_LOGDIR_G)
+    move_data_remote(TB_LOGDIR_D, '/data/' + TB_LOGDIR_D)
+    move_data_remote(TEST_RESULT_DIR, '/data/' + TEST_RESULT_DIR)

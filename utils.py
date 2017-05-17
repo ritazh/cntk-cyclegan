@@ -3,11 +3,10 @@ import os
 import numpy as np
 from cntk import reduce_mean
 
-def plot_images(images, subplot_shape, iteration):
-    dirToSave = "testResults/"
+def plot_images(images, subplot_shape, iteration, dirToSave):
     if not os.path.exists(dirToSave):
         os.makedirs(dirToSave)
-    filePathName = dirToSave + "test_"
+    filePathName = dirToSave + "/test_"
     path = ''.join([filePathName, "_", str(iteration).zfill(4), '.png'])
     path_txt = ''.join([filePathName, "_", str(iteration).zfill(4), '.txt'])
     plt.style.use('ggplot')
