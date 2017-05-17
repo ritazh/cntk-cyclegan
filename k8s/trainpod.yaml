@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: cyclegan-trainer-cntk
+  name: cyclegan-trainer-cntk
+spec:
+  volumes:
+  - name: libraries
+    hostPath:
+      path: /usr/lib/x86_64-linux-gnu
+  - name: azurefile
+    azureFile:
+        secretName: azure-secret
+        shareName: data
+        readOnly: false      
+  containers:
+  - name: cyclegan-trainer-cntk
+    command: ["/bin/sh", "-c"]
+    args: ["export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu_custom:$LD_LIBRARY_PATH; while true; do sleep 30; done;"]
+    image: ritazh/cyclegan-cntk
+    resources:
+      limits:
+        alpha.kubernetes.io/nvidia-gpu: 1
+    volumeMounts:
+    - mountPath: /usr/lib/x86_64-linux-gnu_custom
+      name: libraries
+    - mountPath: "/data"
+      name: azurefile    
+    imagePullPolicy: Always
+  restartPolicy: Never

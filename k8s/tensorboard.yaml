@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cntk
+  name: cntk
+spec:
+  ports:
+  - port: 8888
+    targetPort: 8888
+  selector:
+    app: cntk
+  type: LoadBalancer
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: cntk
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cntk
+    spec:
+      volumes:
+      - name: binaries
+        hostPath:
+          path: /usr/bin/
+      - name: libraries
+        hostPath:
+          path: /usr/lib/x86_64-linux-gnu
+      containers:
+      - name: cntk
+        command: ["bash", "-c"]
+        args: ["source /cntk/activate-cntk && jupyter-notebook --no-browser --port=8888 --ip=0.0.0.0 --notebook-dir=/cntk/Tutorials --allow-root"]
+        image: microsoft/cntk
+        ports:
+        - containerPort: 8888
+        resources:
+          limits:
+            alpha.kubernetes.io/nvidia-gpu: 1
+        volumeMounts:
+        - mountPath: /usr/bin/
+          name: binaries
+        - mountPath: /usr/lib/x86_64-linux-gnu
+          name: libraries
